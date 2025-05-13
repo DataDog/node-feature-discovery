@@ -1,6 +1,5 @@
 ARG BUILDER_IMAGE
-ARG BASE_IMAGE_FULL
-ARG BASE_IMAGE_MINIMAL
+ARG BASE_IMAGE
 
 # Build node feature discovery
 FROM ${BUILDER_IMAGE} AS builder
@@ -18,25 +17,13 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 COPY . /go/node-feature-discovery
 
 ARG VERSION
-ARG HOSTMOUNT_PREFIX
+ARG HOSTMOUNT_PREFIX=/host-
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     make install VERSION=$VERSION HOSTMOUNT_PREFIX=$HOSTMOUNT_PREFIX
 
-# Create full variant of the production image
-FROM ${BASE_IMAGE_FULL} AS full
-
-# Run as unprivileged user
-USER 65534:65534
-
-# Use more verbose logging of gRPC
-ENV GRPC_GO_LOG_SEVERITY_LEVEL="INFO"
-
-COPY --from=builder /go/node-feature-discovery/deployment/components/worker-config/nfd-worker.conf.example /etc/kubernetes/node-feature-discovery/nfd-worker.conf
-COPY --from=builder /go/bin/* /usr/bin/
-
-# Create minimal variant of the production image
-FROM ${BASE_IMAGE_MINIMAL} AS minimal
+FROM ${BASE_IMAGE} AS base
+LABEL maintainers="Compute"
 
 # Run as unprivileged user
 USER 65534:65534
