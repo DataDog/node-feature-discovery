@@ -1,6 +1,5 @@
 ARG BUILDER_IMAGE
-ARG BASE_IMAGE_FULL
-ARG BASE_IMAGE_MINIMAL
+ARG BASE_IMAGE
 
 # Build node feature discovery
 FROM ${BUILDER_IMAGE:-golang} AS builder
@@ -16,7 +15,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 
 # Do actual build
 ARG VERSION
-ARG HOSTMOUNT_PREFIX
+ARG HOSTMOUNT_PREFIX=/host-
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=src=.,target=. \
