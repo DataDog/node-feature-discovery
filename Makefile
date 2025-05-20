@@ -64,8 +64,8 @@ E2E_PULL_IF_NOT_PRESENT ?= false
 E2E_TEST_FULL_IMAGE ?= false
 E2E_GINKGO_LABEL_FILTER ?=
 
-BUILD_FLAGS = -tags osusergo,netgo \
-              -ldflags "-s -w -extldflags=-static -X sigs.k8s.io/node-feature-discovery/pkg/version.version=$(VERSION) -X sigs.k8s.io/node-feature-discovery/pkg/utils/hostpath.pathPrefix=$(HOSTMOUNT_PREFIX)"
+BUILD_FLAGS = -tags osusergo,netgo,fips \
+              -ldflags "-w -X sigs.k8s.io/node-feature-discovery/pkg/version.version=$(VERSION) -X sigs.k8s.io/node-feature-discovery/pkg/utils/hostpath.pathPrefix=$(HOSTMOUNT_PREFIX)"
 
 # multi-arch build with buildx
 IMAGE_ALL_PLATFORMS ?= linux/amd64,linux/arm64,linux/arm/v7
@@ -98,12 +98,12 @@ all: image
 BUILD_BINARIES := nfd-master nfd-worker nfd-topology-updater nfd-gc kubectl-nfd nfd
 
 build-%:
-	$(GO_CMD) build -v -o bin/ $(BUILD_FLAGS) ./cmd/$*
+	CGO_ENABLED=1 GOEXPERIMENT=boringcrypto $(GO_CMD) build -v -o bin/ $(BUILD_FLAGS) ./cmd/$* && $(GO_CMD) tool nm ./bin/$* | grep -E 'sig.FIPSOnly'
 
 build:	$(foreach bin, $(BUILD_BINARIES), build-$(bin))
 
 install-%:
-	$(GO_CMD) install -v $(BUILD_FLAGS) ./cmd/$*
+	CGO_ENABLED=1 GOEXPERIMENT=boringcrypto $(GO_CMD) install -v $(BUILD_FLAGS) ./cmd/$* && $(GO_CMD) tool nm /go/bin/$* | grep -E 'sig.FIPSOnly'
 
 install:	$(foreach bin, $(BUILD_BINARIES), install-$(bin))
 
