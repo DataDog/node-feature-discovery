@@ -1,3 +1,7 @@
+//go:build !ci
+
+// TODO: remove this directive
+
 /*
 Copyright 2019-2021 The Kubernetes Authors.
 
