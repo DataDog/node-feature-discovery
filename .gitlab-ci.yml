@@ -2,6 +2,6 @@ include: https://gitlab-templates.ddbuild.io/compute-delivery/v2/compute-deliver
 
 build-docker-image:
   variables:
-    # Pass the version as Docker build arg
-    EXTRA_ARGS: --build-arg=VERSION=${CI_COMMIT_TAG}
+    # Build from Datadog Dockerfile and pass the version as Docker build arg
+    EXTRA_ARGS: --file=dd.Dockerfile --build-arg=VERSION=${CI_COMMIT_TAG}
   extends: .build-docker-image
