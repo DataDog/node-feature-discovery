@@ -1,6 +1,6 @@
 module sigs.k8s.io/node-feature-discovery/api/nfd
 
-go 1.23.0
+go 1.25.5
 
 require (
 	github.com/stretchr/testify v1.8.4
