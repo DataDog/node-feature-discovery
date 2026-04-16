@@ -2,6 +2,8 @@ module sigs.k8s.io/node-feature-discovery/api/nfd
 
 go 1.23.0
 
+toolchain go1.26.2
+
 require (
 	github.com/stretchr/testify v1.8.4
 	k8s.io/api v0.30.8
